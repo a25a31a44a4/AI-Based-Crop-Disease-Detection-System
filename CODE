@@ -1,0 +1,191 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cctype> // Required for tolower()
+using namespace std;
+
+struct Disease
+{
+    string name;
+    string symptoms;
+    string cause;
+    string solution;
+    string prevention;
+    string pesticideAdvice;
+};
+
+// Simulated "AI prediction" from image filename
+int predictFromImage(const string &imagePath, int totalDiseases)
+{
+    string lower = imagePath;
+    
+    // Fixed loop to work in older C++ standards as well
+    for (size_t i = 0; i < lower.length(); i++) {
+        lower[i] = tolower(lower[i]);
+    }
+
+    if (lower.find("early") != string::npos)   return 1;
+    if (lower.find("late") != string::npos)    return 2;
+    if (lower.find("mold") != string::npos)    return 3;
+    if (lower.find("spot") != string::npos)    return 4;
+    if (lower.find("blight") != string::npos)  return 1;
+    if (lower.find("blast") != string::npos)   return 1;
+    if (lower.find("wilt") != string::npos)    return 2;
+    if (lower.find("rust") != string::npos)    return 2;
+    if (lower.find("mildew") != string::npos)  return 3;
+
+    return 1; // Default fallback
+}
+
+int main()
+{
+    int crop, disease;
+    Disease *selected;
+    int total;
+    string imagePath;
+
+    // TOMATO - 4 DISEASES
+    Disease tomato[4] = {
+        {"Early Blight", "Brown circular spots with rings on leaves.", "Fungal infection.", "Remove infected leaves and maintain plant spacing.", "Avoid overhead watering.", "Consult an expert about registered fungicide options."},
+        {"Late Blight", "Dark patches and rapid leaf damage.", "Phytophthora infestans.", "Remove affected plant material as advised.", "Maintain good drainage and monitor crops.", "Seek expert advice about suitable registered treatments."},
+        {"Leaf Mold", "Yellow patches on upper leaf surfaces.", "Fungal infection.", "Improve ventilation and remove affected leaves.", "Avoid overcrowding and excess moisture.", "Ask an agricultural officer for treatment guidance."},
+        {"Bacterial Spot", "Small dark spots on leaves and fruits.", "Bacterial infection.", "Remove infected plant material.", "Use healthy seeds and maintain field hygiene.", "Get expert advice before selecting a treatment."}
+    };
+
+    // POTATO - 3 DISEASES
+    Disease potato[3] = {
+        {"Early Blight", "Brown spots on older leaves.", "Fungal infection.", "Remove infected leaves and plant debris.", "Maintain field cleanliness.", "Consult an expert about registered treatments."},
+        {"Late Blight", "Dark water-soaked patches on leaves.", "Phytophthora infestans.", "Remove affected plants as advised.", "Use healthy seed potatoes.", "Seek agricultural guidance for control options."},
+        {"Black Scurf", "Dark black patches on potato tubers.", "Rhizoctonia solani fungus.", "Use healthy, disease-free seed potatoes.", "Practice crop rotation.", "Ask an expert about suitable seed treatment."}
+    };
+
+    // RICE - 4 DISEASES
+    Disease rice[4] = {
+        {"Rice Blast", "Diamond-shaped spots on leaves.", "Magnaporthe oryzae fungus.", "Use resistant varieties.", "Maintain balanced fertilizer application.", "Consult an expert about registered fungicides."},
+        {"Bacterial Leaf Blight", "Yellowing and drying along leaf edges.", "Bacterial infection.", "Use resistant rice varieties.", "Avoid excessive nitrogen fertilizer.", "Seek expert advice for management."},
+        {"Sheath Blight", "Oval greenish-grey lesions on leaf sheaths.", "Rhizoctonia solani fungus.", "Remove infected plant debris.", "Avoid excessive plant density.", "Ask an expert about suitable registered treatments."},
+        {"Brown Spot", "Brown spots on leaves and grains.", "Bipolaris oryzae fungus.", "Use healthy seeds and balanced nutrients.", "Maintain proper field management.", "Consult an agricultural officer."}
+    };
+
+    // COTTON - 3 DISEASES
+    Disease cotton[3] = {
+        {"Bacterial Blight", "Dark angular spots on leaves.", "Bacterial infection.", "Use resistant varieties and healthy seeds.", "Maintain field hygiene.", "Consult an agricultural expert."},
+        {"Alternaria Leaf Spot", "Circular brown spots on leaves.", "Alternaria fungus.", "Remove infected plant debris.", "Maintain proper plant spacing.", "Ask an expert about registered treatments."},
+        {"Fusarium Wilt", "Yellowing and wilting of leaves.", "Fusarium fungus.", "Use resistant varieties.", "Practice crop rotation.", "Seek expert disease-management advice."}
+    };
+
+    // CHILLI - 3 DISEASES
+    Disease chilli[3] = {
+        {"Leaf Curl", "Leaves curl and become distorted.", "Viral infection.", "Remove severely affected plants.", "Monitor insect vectors.", "Ask an expert about safe vector management."},
+        {"Anthracnose", "Dark spots on leaves and fruits.", "Colletotrichum fungus.", "Remove infected plant parts.", "Avoid overhead irrigation.", "Consult an expert about registered treatments."},
+        {"Powdery Mildew", "White powder-like growth on leaves.", "Fungal infection.", "Remove badly affected leaves.", "Maintain proper spacing.", "Ask an expert about suitable registered fungicides."}
+    };
+
+    // MAIZE - 3 DISEASES
+    Disease maize[3] = {
+        {"Northern Corn Leaf Blight", "Long grey-green lesions on leaves.", "Exserohilum turcicum fungus.", "Use resistant varieties.", "Remove infected crop residues.", "Consult an expert about management options."},
+        {"Common Rust", "Small reddish-brown pustules on leaves.", "Puccinia sorghi fungus.", "Use resistant maize varieties.", "Monitor plants regularly.", "Seek expert treatment guidance."},
+        {"Downy Mildew", "Yellow stripes and pale growth on leaves.", "Downy mildew pathogen.", "Use resistant varieties.", "Follow recommended crop rotation.", "Consult an agricultural officer."}
+    };
+
+    // BRINJAL - 2 DISEASES
+    Disease brinjal[2] = {
+        {"Phomopsis Blight", "Brown spots and drying of leaves.", "Phomopsis vexans fungus.", "Remove infected plant parts.", "Use healthy seeds and seedlings.", "Ask an expert about registered treatments."},
+        {"Bacterial Wilt", "Sudden wilting of the entire plant.", "Ralstonia solanacearum.", "Remove infected plants as advised.", "Practice crop rotation.", "Consult an agricultural officer."}
+    };
+
+    // MANGO - 2 DISEASES
+    Disease mango[2] = {
+        {"Anthracnose", "Dark spots on leaves, flowers and fruits.", "Colletotrichum fungus.", "Remove infected plant material.", "Prune for good airflow.", "Consult an expert about registered treatments."},
+        {"Powdery Mildew", "White powder-like growth on flowers and leaves.", "Fungal infection.", "Remove heavily affected plant parts.", "Maintain orchard hygiene.", "Seek expert treatment guidance."}
+    };
+
+    cout << "\n====================================";
+    cout << "\n   AI CROP DISEASE DETECTION SYSTEM";
+    cout << "\n====================================";
+
+    // STEP 1
+    cout << "\n\nSTEP 1: SELECT YOUR CROP";
+    cout << "\n1. Tomato\n2. Potato\n3. Rice\n4. Cotton";
+    cout << "\n5. Chilli\n6. Maize\n7. Brinjal\n8. Mango";
+    cout << "\n\nEnter crop number: ";
+    cin >> crop;
+    
+    // Clear the enter key from the buffer so getline() works properly next
+    cin.ignore(); 
+
+    switch(crop)
+    {
+        case 1: selected = tomato; total = 4; break;
+        case 2: selected = potato; total = 3; break;
+        case 3: selected = rice; total = 4; break;
+        case 4: selected = cotton; total = 3; break;
+        case 5: selected = chilli; total = 3; break;
+        case 6: selected = maize; total = 3; break;
+        case 7: selected = brinjal; total = 2; break;
+        case 8: selected = mango; total = 2; break;
+        default:
+            cout << "\nInvalid crop selection!";
+            return 0;
+    }
+
+    // STEP 2
+    cout << "\n\nSTEP 2: UPLOAD CROP IMAGE";
+    cout << "\nEnter image file path (e.g., early_blight.jpg): ";
+    getline(cin, imagePath);
+
+    // Check if file exists (using .c_str() for older compiler compatibility)
+    ifstream file(imagePath.c_str());
+    if (!file.good())
+    {
+        cout << "\n[ERROR] Image file not found: " << imagePath << "\n";
+        cout << "Make sure the image is in the same folder as your .cpp file.\n";
+        return 0;
+    }
+    file.close();
+
+    cout << "\n[INFO] Image loaded successfully: " << imagePath;
+    cout << "\n[INFO] Running AI disease prediction...";
+
+    // STEP 3
+    disease = predictFromImage(imagePath, total);
+
+    if(disease < 1 || disease > total)
+    {
+        disease = 1;
+    }
+
+    Disease d = selected[disease - 1];
+    cout << "\n[INFO] Prediction complete.";
+
+    // STEP 4
+    cout << "\n\n====================================";
+    cout << "\n       DISEASE INFORMATION";
+    cout << "\n====================================";
+
+    cout << "\n\nPredicted Disease: " << d.name;
+    cout << "\n\nSymptoms: " << d.symptoms;
+    cout << "\n\nPossible Cause: " << d.cause;
+    cout << "\n\nSolution: " << d.solution;
+    cout << "\n\nPrevention: " << d.prevention;
+
+    cout << "\n\n====================================";
+    cout << "\n     CROP HEALTH RECOMMENDATIONS";
+    cout << "\n====================================";
+
+    cout << "\n\nTreatment Advice: " << d.pesticideAdvice;
+    cout << "\n\nAdditional Suggestions:";
+    cout << "\n1. Monitor crop health regularly.";
+    cout << "\n2. Use healthy seeds.";
+    cout << "\n3. Maintain proper irrigation.";
+    cout << "\n4. Remove infected plant material safely.";
+    cout << "\n5. Follow agricultural expert advice.";
+
+    cout << "\n\n====================================";
+    cout << "\n       ANALYSIS COMPLETED";
+    cout << "\n====================================";
+
+    cout << "\n\nThank you for using our system!\n";
+
+    return 0;
+}
